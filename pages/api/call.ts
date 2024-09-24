@@ -11,13 +11,15 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   // 收集请求信息
   const requestInfo: RequestLog = {
+    timestamp: new Date().toISOString(), // This already stores in UTC
     method: req.method ?? "",
     query: req.query,
     body: req.body,
     headers: req.headers,
-    ip: req.socket.remoteAddress,
+    ip: (req.headers["x-forwarded-for"] as string) || req.socket.remoteAddress,
     browser: uaParser.getBrowser().name,
     os: uaParser.getOS().name,
+    origin: req.headers.origin || "",
   };
 
   // 将请求信息添加到存储中
